@@ -57,10 +57,10 @@ def PlotTimeline(times, data, minuteScale):
 
 	ax.stackplot(times, values, labels=labels)
 	ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M %d/%m'))
-	ax.xaxis.set_major_locator(mdates.HourLocator(interval=24))
+	ax.xaxis.set_major_locator(mdates.HourLocator(interval=24*7))
 
 	plt.legend(loc='upper left')
-	plt.title('Maximum players in game by {}-minute period {} to {}'.format(minuteScale, times[0], times[-1]))
+	plt.title('Maximum players in team games by {}-minute period {} to {}'.format(minuteScale, times[0], times[-1]))
 	plt.xlabel('Time')
 	plt.ylabel('Players')
 
@@ -80,6 +80,28 @@ def PrintTimeline(minTime, maxTime, minuteScale, playerLists):
 		print(str)
 		time = time + timedelta(minutes=minuteScale)
 		index = index + 1
+
+
+def PrintDailyValues(times, data):
+	data = data.copy()
+	del data["specs"]
+
+	outputs = []
+	lastTime = times[0]
+	index = 0
+	acc = 0
+	for time in times:
+		if time.date() != lastTime.date():
+			outputs.append((lastTime, acc))
+			lastTime = time
+			acc = 0
+		for count in data.values():
+			acc += count[index]
+		index += 1
+	
+	for value in outputs:
+		print('{},{}'.format(value[0].strftime("%I:%M %d/%m %p"), value[1]))
+
 
 
 def MakeAverageCounts(processed, minTime, step, times, mostBattles):
@@ -171,16 +193,18 @@ def MakeTimeline(processed, trackCount, minuteScale):
 		times.append(time)
 		time = time + step
 
-	#playerLists = MakeAverageCounts(processed, minTime, step, times, mostBattles)
-	playerLists = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
+	averageCounts = MakeAverageCounts(processed, minTime, step, times, mostBattles)
+	maxCounts = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
 
-	PlotTimeline(times, playerLists, minuteScale)
+	PrintDailyValues(times, averageCounts)
 	#PrintTimeline(minTime, maxTime, minuteScale, playerLists)
+	PlotTimeline(times, maxCounts, minuteScale)
 
 
-file = "paste13_06_25_to_13_07_25.txt"
+#file = "paste13_06_25_to_13_07_25.txt"
+file = "big.txt"
 trackCount = 5
-minuteScale = 20
+minuteScale = 10
 
 filterOut = [
 	"[A] Pro 1v1 Host",
