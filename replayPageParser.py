@@ -4,6 +4,8 @@ import math
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.ticker as ticker
+from matplotlib.patches import Patch
 import pandas as pd
 
 def ProcessBlock(lines, processed, filterOut):
@@ -55,16 +57,24 @@ def PlotTimeline(times, data, minuteScale):
 
 	fig, ax = plt.subplots(figsize=(12, 6))
 
-	ax.stackplot(times, values, labels=labels)
-	ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M %d/%m'))
-	ax.xaxis.set_major_locator(mdates.HourLocator(interval=24*7))
+	ax.yaxis.set_major_locator(ticker.MultipleLocator(2))
+	ax.grid(axis='y', linestyle='-', color='lightgray')
+	ax.grid(axis='x', linestyle='-', color='lightgray')
+	plt.axhline(y=32, linestyle='-', color='red')
+	ax.set_axisbelow(True)
 
-	plt.legend(loc='upper left')
+	colors = plt.rcParams['axes.prop_cycle'].by_key()['color'][:len(labels)]
+	ax.stackplot(times, values, labels=labels, step='post', colors=colors[::-1])
+	ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M %d/%m'))
+	ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
+
+	handles = [Patch(facecolor=colors[i], label=label) for i, label in enumerate(labels[::-1])]
+	ax.legend(handles=handles, loc='upper left')
 	plt.title('Maximum players in team games by {}-minute period {} to {}'.format(minuteScale, times[0], times[-1]))
 	plt.xlabel('Time')
 	plt.ylabel('Players')
 
-	plt.xticks(rotation=45)
+	plt.xticks(rotation=90)
 	plt.tight_layout()
 	plt.show()
 
@@ -82,7 +92,7 @@ def PrintTimeline(minTime, maxTime, minuteScale, playerLists):
 		index = index + 1
 
 
-def PrintDailyValues(times, data):
+def PrintDailyValues(times, data, step, offset):
 	data = data.copy()
 	del data["specs"]
 
@@ -91,7 +101,7 @@ def PrintDailyValues(times, data):
 	index = 0
 	acc = 0
 	for time in times:
-		if time.date() != lastTime.date():
+		if (time - timedelta(hours=offset)).date() != (lastTime - timedelta(hours=offset)).date():
 			outputs.append((lastTime, acc))
 			lastTime = time
 			acc = 0
@@ -100,8 +110,11 @@ def PrintDailyValues(times, data):
 		index += 1
 	
 	for value in outputs:
-		print('{},{}'.format(value[0].strftime("%I:%M %d/%m %p"), value[1]))
-
+		print('{}-{}: {}'.format(
+			value[0].strftime("%I:%M %d/%m %p"),
+			(value[0]+ timedelta(hours=24)).strftime("%I:%M %d/%m %p"),
+			value[1]*step
+		))
 
 
 def MakeAverageCounts(processed, minTime, step, times, mostBattles):
@@ -110,13 +123,10 @@ def MakeAverageCounts(processed, minTime, step, times, mostBattles):
 	for title in mostBattles:
 		players = [0] * len(times)
 		specs = [0] * len(times)
-		time = minTime
-		index = 0
 		battles = processed[title]
 		for data in battles:
-			while time < data["start"] - step:
-				time += step
-				index += 1
+			index = math.floor((data["start"] - minTime) / step)
+			time = minTime + index*step
 			while time < data["end"] - step:
 				if time < data["start"]:
 					prop = (min(time + step, data["end"]) - data["start"]) / step
@@ -146,13 +156,10 @@ def MakeMaximumCounts(processed, minTime, step, times, mostBattles):
 	for title in mostBattles:
 		players = [0] * len(times)
 		specs = [0] * len(times)
-		time = minTime
-		index = 0
 		battles = processed[title]
 		for data in battles:
-			while time < data["start"] - step:
-				time += step
-				index += 1
+			index = math.floor((data["start"] - minTime) / step)
+			time = minTime + index*step
 			while time < data["end"]:
 				players[index] = max(players[index], data["players"])
 				specs[index] = max(specs[index], data["specs"])
@@ -196,13 +203,13 @@ def MakeTimeline(processed, trackCount, minuteScale):
 	averageCounts = MakeAverageCounts(processed, minTime, step, times, mostBattles)
 	maxCounts = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
 
-	PrintDailyValues(times, averageCounts)
-	#PrintTimeline(minTime, maxTime, minuteScale, playerLists)
+	PrintDailyValues(times, averageCounts, minuteScale, 6)
+	#PrintTimeline(minTime, maxTime, minuteScale, maxCounts)
 	PlotTimeline(times, maxCounts, minuteScale)
 
 
 #file = "paste13_06_25_to_13_07_25.txt"
-file = "big.txt"
+file = "early.txt"
 trackCount = 5
 minuteScale = 10
 
