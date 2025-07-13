@@ -60,7 +60,8 @@ def PlotTimeline(times, data, minuteScale):
 	ax.yaxis.set_major_locator(ticker.MultipleLocator(2))
 	ax.grid(axis='y', linestyle='-', color='lightgray')
 	ax.grid(axis='x', linestyle='-', color='lightgray')
-	plt.axhline(y=32, linestyle='-', color='red')
+	plt.axhline(y=32, linestyle='-', color='red', linewidth=0.5)
+	plt.axhline(y=22, linestyle='-', color='red', linewidth=0.5)
 	ax.set_axisbelow(True)
 
 	colors = plt.rcParams['axes.prop_cycle'].by_key()['color'][:len(labels)]
@@ -110,9 +111,8 @@ def PrintDailyValues(times, data, step, offset):
 		index += 1
 	
 	for value in outputs:
-		print('{}-{}: {}'.format(
-			value[0].strftime("%I:%M %d/%m %p"),
-			(value[0]+ timedelta(hours=24)).strftime("%I:%M %d/%m %p"),
+		print('{}: {:,.0f}'.format(
+			value[0].isoformat(),
 			value[1]*step
 		))
 
@@ -203,7 +203,7 @@ def MakeTimeline(processed, trackCount, minuteScale):
 	averageCounts = MakeAverageCounts(processed, minTime, step, times, mostBattles)
 	maxCounts = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
 
-	PrintDailyValues(times, averageCounts, minuteScale, 6)
+	PrintDailyValues(times, averageCounts, minuteScale, 4)
 	#PrintTimeline(minTime, maxTime, minuteScale, maxCounts)
 	PlotTimeline(times, maxCounts, minuteScale)
 
