@@ -117,43 +117,46 @@ def PrintTimeline(minTime, maxTime, minuteScale, playerLists):
 		time = time + timedelta(minutes=minuteScale)
 		index = index + 1
 
+def GetDayEnd(time, offset):
+	return (time - timedelta(hours=offset)).replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)
 
 def GetDailyValues(times, data, step, offset, mostBattles, processed):
 	data = data.copy()
 	del data["specs"]
 
 	outputs = {}
+	nextDay = GetDayEnd(times[0], offset)
 	lastTime = times[0]
 	index = 0
 	playerAcc = 0
 	gameAcc = 0
 	for time in times:
-		if (time - timedelta(hours=offset)).date() != (lastTime - timedelta(hours=offset)).date():
-			outputs[time.replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)] = {
+		if time >= nextDay:
+			outputs[nextDay] = {
 				"start" : lastTime,
-				"end" : time, 
+				"end" : nextDay, 
 				"playerminutes" : playerAcc*step,
 				"battleSizes" : [0] * 40,
 			}
-			
+			nextDay = GetDayEnd(time, offset)
 			lastTime = time
 			playerAcc = 0
+			print(nextDay)
 		for count in data.values():
 			playerAcc += count[index]
 		index += 1
 	
-	outputs[time.replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)] = {
+	outputs[nextDay] = {
 		"start" : lastTime,
 		"end" : time, 
 		"playerminutes" : playerAcc*step,
 		"battleSizes" : [0] * 40,
 	}
-	outList = list(outputs.values())
 
 	for title in mostBattles:
 		battles = processed[title]
 		for data in battles:
-			battleDay = data["start"].replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)
+			battleDay = GetDayEnd(data["start"], offset)
 			if battleDay in outputs:
 				if data["duration"] >= 5:
 					outputs[battleDay]["battleSizes"][data["players"]] += 1
@@ -276,7 +279,6 @@ def MakeTimeline(processed, trackCount, minuteScale, dayOffset, weekAverage):
 	minTime = minTime.replace(minute=math.floor(minTime.minute/minuteScale)*minuteScale, second=0)
 	if weekAverage:
 		minTime = minTime.replace(hour=0, minute=0, second=0) + timedelta(hours=dayOffset - 24)
-
 	maxTime = maxTime.replace(minute=math.floor(maxTime.minute/minuteScale)*minuteScale, second=0)
 	maxTime = maxTime + timedelta(minutes=minuteScale)
 	
