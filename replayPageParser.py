@@ -129,7 +129,7 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 	gameAcc = 0
 	for time in times:
 		if (time - timedelta(hours=offset)).date() != (lastTime - timedelta(hours=offset)).date():
-			outputs[time] = {
+			outputs[time.replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)] = {
 				"start" : lastTime,
 				"end" : time, 
 				"playerminutes" : playerAcc*step,
@@ -142,7 +142,7 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 			playerAcc += count[index]
 		index += 1
 	
-	outputs[time] = {
+	outputs[time.replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)] = {
 		"start" : lastTime,
 		"end" : time, 
 		"playerminutes" : playerAcc*step,
@@ -154,9 +154,6 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 		battles = processed[title]
 		for data in battles:
 			battleDay = data["start"].replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)
-			if battleDay not in outputs:
-				if battleDay > outList[-1]["end"]:
-					battleDay = outList[-1]["end"]
 			if battleDay in outputs:
 				if data["duration"] >= 5:
 					outputs[battleDay]["battleSizes"][data["players"]] += 1
@@ -164,7 +161,6 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 				print("Missing battle day {}".format(battleDay))
 
 	return outputs
-
 
 
 def MakeAverageCounts(processed, minTime, step, times, mostBattles):
@@ -224,7 +220,45 @@ def MakeMaximumCounts(processed, minTime, step, times, mostBattles):
 	return playerLists
 
 
-def MakeTimeline(processed, trackCount, minuteScale, dayOffset):
+def GetWeekAverage(playerCounts, daily, minuteScale, minTime):
+	weekCounts = {}
+	weekSize = int(7*24*60 / minuteScale)
+	for name, data in playerCounts.items():
+		week = [0] * weekSize
+		for x in range(weekSize):
+			indices = range(x, len(data), weekSize)
+			values = [data[i] for i in indices]
+			week[x] = sum(values) / len(values)
+		weekCounts[name] = week
+	
+	times = []
+	time = minTime
+	step = timedelta(minutes=minuteScale)
+	while time < minTime + timedelta(days=7):
+		times.append(time)
+		time = time + step
+
+	weekDaily = {}
+	for day, data in daily.items():
+		match = [x for x in weekDaily.keys() if x.weekday() == day.weekday()]
+		if len(match) == 0:
+			weekDaily[day] = data.copy()
+			weekDaily[day]["copies"] = 1
+		else:
+			match = match[0]
+			weekDaily[match]["playerminutes"] += data["playerminutes"]
+			weekDaily[match]["battleSizes"] = [
+				x + y for (x, y) in zip(weekDaily[match]["battleSizes"], data["battleSizes"])]
+			weekDaily[match]["copies"] += 1
+
+	for day, data in weekDaily.items():
+		data["playerminutes"] /= data["copies"]
+		data["battleSizes"] = [x / data["copies"] for x in data["battleSizes"]]
+
+	return weekCounts, weekDaily, times
+
+
+def MakeTimeline(processed, trackCount, minuteScale, dayOffset, weekAverage):
 	minTime = False
 	maxTime = False
 	battleCount = {k : len(v) for k, v in processed.items()}
@@ -240,6 +274,9 @@ def MakeTimeline(processed, trackCount, minuteScale, dayOffset):
 				maxTime = data["end"]
 	
 	minTime = minTime.replace(minute=math.floor(minTime.minute/minuteScale)*minuteScale, second=0)
+	if weekAverage:
+		minTime = minTime.replace(hour=0, minute=0, second=0) + timedelta(hours=dayOffset - 24)
+
 	maxTime = maxTime.replace(minute=math.floor(maxTime.minute/minuteScale)*minuteScale, second=0)
 	maxTime = maxTime + timedelta(minutes=minuteScale)
 	
@@ -252,13 +289,15 @@ def MakeTimeline(processed, trackCount, minuteScale, dayOffset):
 
 	averageCounts = MakeAverageCounts(processed, minTime, step, times, mostBattles)
 	maxCounts = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
-
 	daily = GetDailyValues(times, averageCounts, minuteScale, dayOffset, mostBattles, processed)
-	#PrintTimeline(minTime, maxTime, minuteScale, maxCounts)
-	PlotTimeline(times, daily, maxCounts, minuteScale)
+	if weekAverage:
+		weekCounts, weekDaily, weekTimes = GetWeekAverage(maxCounts, daily, minuteScale, minTime)
+		PlotTimeline(weekTimes, weekDaily, weekCounts, minuteScale)
+	else:
+		PlotTimeline(times, daily, maxCounts, minuteScale)
 
 
-def ProcessReplayFiles(files):
+def ProcessReplayFiles(files, filterOut):
 	for file in files:
 		with open(file) as file:
 			lines = []
@@ -279,6 +318,7 @@ files = ["early.txt"]
 trackCount = 5
 minuteScale = 10
 dayOffset = 6
+weekAverage = False
 
 filterOut = [
 	"[A] Pro 1v1 Host",
@@ -288,6 +328,6 @@ filterOut = [
 	"[A] Arena Mod",
 ]
 
-processed = ProcessReplayFiles(files)
+processed = ProcessReplayFiles(files, filterOut)
 #MakeBattleList(processed)
-MakeTimeline(processed, trackCount, minuteScale, dayOffset)
+MakeTimeline(processed, trackCount, minuteScale, dayOffset, weekAverage)
