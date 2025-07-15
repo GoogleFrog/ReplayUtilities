@@ -48,7 +48,7 @@ def MakeBattleList(processed):
 				data["duration"], data["specs"]))
 
 
-def PlotTimeline(times, data, minuteScale):
+def PlotTimeline(times, dayAgg, data, minuteScale):
 	data = data.copy()
 	del data["specs"]
 
@@ -63,15 +63,40 @@ def PlotTimeline(times, data, minuteScale):
 	plt.axhline(y=32, linestyle='-', color='red', linewidth=0.5)
 	plt.axhline(y=22, linestyle='-', color='red', linewidth=0.5)
 	ax.set_axisbelow(True)
+	ax.set_xlim(list(dayAgg.values())[0]["end"] - timedelta(hours=24), list(dayAgg.values())[-1]["end"])
 
 	colors = plt.rcParams['axes.prop_cycle'].by_key()['color'][:len(labels)]
 	ax.stackplot(times, values, labels=labels, step='post', colors=colors[::-1])
 	ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M %d/%m'))
 	ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
 
+	# Space for the labels at the top
+	ymin, ymax = ax.get_ylim()
+	ax.set_ylim(ymin, ymax + 7)
+
+	# Add vertical lines and labels
+	for dayData in dayAgg.values():
+		ax.axvline(x=dayData["end"], color='black', linestyle='--', linewidth=0.5)
+		ax.text(dayData["start"] + timedelta(hours=2), ax.get_ylim()[1] - 1,
+			"{}\n{:,.0f} pm\n{:,.0f} games\n{:,.0f} with ≥ 16\n{:,.0f} with ≥ 22\n{:,.0f} with ≤ 10".format(
+				(dayData["end"] - timedelta(hours=12)).strftime('%A'),
+				dayData["playerminutes"],
+				sum(dayData["battleSizes"]),
+				sum(dayData["battleSizes"][16::]),
+				sum(dayData["battleSizes"][22::]),
+				sum(dayData["battleSizes"][::10])),
+			rotation=0, verticalalignment='top', horizontalalignment='left',
+			backgroundcolor='white')
+
+
 	handles = [Patch(facecolor=colors[i], label=label) for i, label in enumerate(labels[::-1])]
-	ax.legend(handles=handles, loc='upper left')
-	plt.title('Maximum players in team games by {}-minute period {} to {}'.format(minuteScale, times[0], times[-1]))
+	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.835),)
+	plt.title(
+		'Maximum players in team games by {}-minute period {} to {}. Counts in playerminutes (pm). Game counts include ≥ 5 minutes.'.format(
+		minuteScale,
+		times[0].strftime('%D %H:%M'),
+		times[-1].strftime('%D %H:%M'),
+	))
 	plt.xlabel('Time')
 	plt.ylabel('Players')
 
@@ -93,28 +118,53 @@ def PrintTimeline(minTime, maxTime, minuteScale, playerLists):
 		index = index + 1
 
 
-def PrintDailyValues(times, data, step, offset):
+def GetDailyValues(times, data, step, offset, mostBattles, processed):
 	data = data.copy()
 	del data["specs"]
 
-	outputs = []
+	outputs = {}
 	lastTime = times[0]
 	index = 0
-	acc = 0
+	playerAcc = 0
+	gameAcc = 0
 	for time in times:
 		if (time - timedelta(hours=offset)).date() != (lastTime - timedelta(hours=offset)).date():
-			outputs.append((lastTime, acc))
+			outputs[time] = {
+				"start" : lastTime,
+				"end" : time, 
+				"playerminutes" : playerAcc*step,
+				"battleSizes" : [0] * 40,
+			}
+			
 			lastTime = time
-			acc = 0
+			playerAcc = 0
 		for count in data.values():
-			acc += count[index]
+			playerAcc += count[index]
 		index += 1
 	
-	for value in outputs:
-		print('{}: {:,.0f}'.format(
-			value[0].isoformat(),
-			value[1]*step
-		))
+	outputs[time] = {
+		"start" : lastTime,
+		"end" : time, 
+		"playerminutes" : playerAcc*step,
+		"battleSizes" : [0] * 40,
+	}
+	outList = list(outputs.values())
+
+	for title in mostBattles:
+		battles = processed[title]
+		for data in battles:
+			battleDay = data["start"].replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)
+			if battleDay not in outputs:
+				if battleDay > outList[-1]["end"]:
+					battleDay = outList[-1]["end"]
+			if battleDay in outputs:
+				if data["duration"] >= 5:
+					outputs[battleDay]["battleSizes"][data["players"]] += 1
+			else:
+				print("Missing battle day {}".format(battleDay))
+
+	return outputs
+
 
 
 def MakeAverageCounts(processed, minTime, step, times, mostBattles):
@@ -174,7 +224,7 @@ def MakeMaximumCounts(processed, minTime, step, times, mostBattles):
 	return playerLists
 
 
-def MakeTimeline(processed, trackCount, minuteScale):
+def MakeTimeline(processed, trackCount, minuteScale, dayOffset):
 	minTime = False
 	maxTime = False
 	battleCount = {k : len(v) for k, v in processed.items()}
@@ -203,15 +253,32 @@ def MakeTimeline(processed, trackCount, minuteScale):
 	averageCounts = MakeAverageCounts(processed, minTime, step, times, mostBattles)
 	maxCounts = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
 
-	PrintDailyValues(times, averageCounts, minuteScale, 4)
+	daily = GetDailyValues(times, averageCounts, minuteScale, dayOffset, mostBattles, processed)
 	#PrintTimeline(minTime, maxTime, minuteScale, maxCounts)
-	PlotTimeline(times, maxCounts, minuteScale)
+	PlotTimeline(times, daily, maxCounts, minuteScale)
 
+
+def ProcessReplayFiles(files):
+	for file in files:
+		with open(file) as file:
+			lines = []
+			processed = {}
+			for line in file:
+				line = line.rstrip()
+				if line != "":
+					lines.append(line)
+					if 'Duration' in line:
+						ProcessBlock(lines, processed, filterOut)
+						lines = []
+	for title, battles in processed.items():
+		battles.sort(key=SortBattles)
+	return processed
 
 #file = "paste13_06_25_to_13_07_25.txt"
-file = "early.txt"
+files = ["early.txt"]
 trackCount = 5
 minuteScale = 10
+dayOffset = 6
 
 filterOut = [
 	"[A] Pro 1v1 Host",
@@ -221,19 +288,6 @@ filterOut = [
 	"[A] Arena Mod",
 ]
 
-with open(file) as file:
-	lines = []
-	processed = {}
-	for line in file:
-		line = line.rstrip()
-		if line != "":
-			lines.append(line)
-			if 'Duration' in line:
-				ProcessBlock(lines, processed, filterOut)
-				lines = []
-	
-	for title, battles in processed.items():
-		battles.sort(key=SortBattles)
-	
-	#MakeBattleList(processed)
-	MakeTimeline(processed, trackCount, minuteScale)
+processed = ProcessReplayFiles(files)
+#MakeBattleList(processed)
+MakeTimeline(processed, trackCount, minuteScale, dayOffset)
