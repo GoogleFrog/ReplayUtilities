@@ -5,8 +5,10 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
+from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 import pandas as pd
+import numpy as np
 
 def ProcessBlock(lines, processed, filterOut):
 	if len(lines[3].split()) < 2:
@@ -34,6 +36,16 @@ def ProcessBlock(lines, processed, filterOut):
 	})
 
 
+def RollingAverage(data, windowSize):
+	if windowSize % 2 == 0:
+		raise ValueError("Window size must be odd for centering.")
+	half_window = windowSize // 2
+	smoothed = np.convolve(data, np.ones(windowSize)/windowSize, mode='valid')
+	# Pad with NaNs (or extend the original times to match)
+	padding = [np.nan] * half_window
+	return padding + list(smoothed) + padding
+
+
 def SortBattles(a):
 	return a["start"]
 
@@ -44,13 +56,17 @@ def MakeBattleList(processed):
 		battles.sort(key=SortBattles)
 		for data in battles:
 			print('{},{},{},{},{}'.format(
-				title, data["players"], data["start"].strftime("%H:%M"),
+				title, data["players"], data["start"].strftime("%Y-%m-%d %H:%M"),
 				data["duration"], data["specs"]))
 
 
-def PlotTimeline(times, dayAgg, data, minuteScale):
+def PlotTimeline(times, dayAgg, data, minuteScale, weekAverage):
 	data = data.copy()
+	specs = data["specs"]
 	del data["specs"]
+
+	windowSize = 21
+	specs = RollingAverage(specs, windowSize)
 
 	labels = list(data.keys())[::-1]
 	values = [data[label] for label in labels]
@@ -67,7 +83,11 @@ def PlotTimeline(times, dayAgg, data, minuteScale):
 
 	colors = plt.rcParams['axes.prop_cycle'].by_key()['color'][:len(labels)]
 	ax.stackplot(times, values, labels=labels, step='post', colors=colors[::-1])
-	ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M %d/%m'))
+	ax.plot(times, specs, label='Spectators', linestyle='--', color='black', linewidth=1)
+	if weekAverage:
+		ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+	else:
+		ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M %d/%m'))
 	ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
 
 	# Space for the labels at the top
@@ -86,14 +106,19 @@ def PlotTimeline(times, dayAgg, data, minuteScale):
 				sum(dayData["battleSizes"][22::]),
 				sum(dayData["battleSizes"][::10])),
 			rotation=0, verticalalignment='top', horizontalalignment='left',
-			backgroundcolor='white')
-
+			backgroundcolor='white', fontsize=10)
 
 	handles = [Patch(facecolor=colors[i], label=label) for i, label in enumerate(labels[::-1])]
-	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.835),)
+	line_handle = Line2D([0], [0], color='black', linewidth=2, label='Spectators (smoothed)')
+	handles.append(line_handle)
+	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.835), fontsize=10)
+	if weekAverage:
+		title = "Average players in team games"
+	else:
+		title = "Maximum players in team games"
 	plt.title(
-		'Maximum players in team games by {}-minute period {} to {}. Counts in playerminutes (pm). Game counts include ≥ 5 minutes.'.format(
-		minuteScale,
+		'{} by {}-minute period {} to {}. Counts in playerminutes (pm). Game counts include ≥ 5 minutes.'.format(
+		title, minuteScale,
 		times[0].strftime('%D %H:%M'),
 		times[-1].strftime('%D %H:%M'),
 	))
@@ -141,7 +166,6 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 			nextDay = GetDayEnd(time, offset)
 			lastTime = time
 			playerAcc = 0
-			print(nextDay)
 		for count in data.values():
 			playerAcc += count[index]
 		index += 1
@@ -294,9 +318,9 @@ def MakeTimeline(processed, trackCount, minuteScale, dayOffset, weekAverage):
 	daily = GetDailyValues(times, averageCounts, minuteScale, dayOffset, mostBattles, processed)
 	if weekAverage:
 		weekCounts, weekDaily, weekTimes = GetWeekAverage(maxCounts, daily, minuteScale, minTime)
-		PlotTimeline(weekTimes, weekDaily, weekCounts, minuteScale)
+		PlotTimeline(weekTimes, weekDaily, weekCounts, minuteScale, weekAverage)
 	else:
-		PlotTimeline(times, daily, maxCounts, minuteScale)
+		PlotTimeline(times, daily, maxCounts, minuteScale, weekAverage)
 
 
 def ProcessReplayFiles(files, filterOut):
@@ -317,7 +341,7 @@ def ProcessReplayFiles(files, filterOut):
 
 #file = "paste13_06_25_to_13_07_25.txt"
 files = ["early.txt"]
-trackCount = 5
+trackCount = 6
 minuteScale = 10
 dayOffset = 6
 weekAverage = False

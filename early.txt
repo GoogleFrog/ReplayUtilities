@@ -1,4 +1,109 @@
 
+[A] Small Teams All Welcome (8p)
+Teams: 2v2
+Rogues River v1.2 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	1
+Date: 	7/15/2025 1:55:15 PM (24 minutes ago)
+Duration: 	11 minutes
+Custom Teams Replacement
+Teams: 4v4
+Comet Catcher Redux v3.1 (Zero-K v1.13.6.4)
+	
+Players: 	8
+Spectators: 	10
+Date: 	7/15/2025 1:17:51 PM (61 minutes ago)
+Duration: 	22 minutes
+Custom Teams Replacement
+Teams: 5v5
+Mercurial v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	12
+Date: 	7/15/2025 12:59:47 PM (79 minutes ago)
+Duration: 	11 minutes
+Custom Teams Replacement
+Teams: 7v6
+Akilon Wastelands ZK v1 (Zero-K v1.13.6.4)
+	
+Players: 	13
+Spectators: 	7
+Date: 	7/15/2025 12:41:01 PM (98 minutes ago)
+Duration: 	14 minutes
+Custom Teams Replacement
+Teams: 7v6
+BananaValley (Zero-K v1.13.6.4)
+	
+Players: 	13
+Spectators: 	6
+Date: 	7/15/2025 12:23:46 PM (116 minutes ago)
+Duration: 	13 minutes
+Custom Teams Replacement
+Teams: 7v7
+BananaValley (Zero-K v1.13.6.4)
+	
+Players: 	14
+Spectators: 	3
+Date: 	7/15/2025 12:20:09 PM (119 minutes ago)
+Duration: 	0 seconds
+Custom Teams Replacement
+Teams: 6v6
+LLTAComplexV2 (Zero-K v1.13.6.4)
+	
+Players: 	12
+Spectators: 	6
+Date: 	7/15/2025 12:02:56 PM (2 hours ago)
+Duration: 	12 minutes
+Custom Teams Replacement
+Teams: 6v5
+Fallendell_V4 (Zero-K v1.13.6.4)
+	
+Players: 	11
+Spectators: 	6
+Date: 	7/15/2025 11:45:09 AM (2 hours ago)
+Duration: 	12 minutes
+Custom Teams Replacement
+Teams: 3v3
+Comet Catcher Redux v3.1 (Zero-K v1.13.6.4)
+	
+Players: 	6
+Spectators: 	5
+Date: 	7/15/2025 11:32:11 AM (2 hours ago)
+Duration: 	9 minutes
+Custom Teams Replacement
+Teams: 2v2
+Cobalt Dream v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	3
+Date: 	7/15/2025 11:09:29 AM (3 hours ago)
+Duration: 	11 minutes
+Custom Teams Replacement
+Teams: 2v2
+Cobalt Dream v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	1
+Date: 	7/15/2025 11:04:59 AM (3 hours ago)
+Duration: 	0 seconds
+[A] Teams All Welcome
+Teams: 1v1
+Otago 1.4 (Zero-K v1.13.6.4)
+	
+Players: 	2
+Spectators: 	3
+Date: 	7/15/2025 4:10:00 AM (10 hours ago)
+Duration: 	16 minutes
+[A] Teams All Welcome
+Teams: 1v1
+AlienDesert (Zero-K v1.13.6.4)
+	
+Players: 	2
+Spectators: 	4
+Date: 	7/15/2025 3:44:45 AM (10 hours ago)
+Duration: 	19 minutes 
+
 [A] Teams All Welcome
 Teams: 4v4
 Otago Redux 1.4 (Zero-K v1.13.6.4)
