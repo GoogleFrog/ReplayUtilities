@@ -430,9 +430,8 @@ filterOut = [
 minuteScale = 10
 dayOffset = 6
 
-def GetBigData():
+def GetBigData(weekAverage):
 	trackCount = 5
-	weekAverage = True
 	processed = ProcessReplayFiles(["big.txt", "janFeb.txt"], filterOut)
 	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
 	return times, daily, counts, rawRange
@@ -440,12 +439,18 @@ def GetBigData():
 
 def PlotBigData():
 	weekAverage = True
-	times, daily, counts, rawRange = GetBigData()
+	times, daily, counts, rawRange = GetBigData(weekAverage)
 	PlotWeekStats(daily)
 	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
 
 
-def PlotExperimentData():
+def PlotBigDataEveryWeek():
+	weekAverage = False
+	times, daily, counts, rawRange = GetBigData(weekAverage)
+	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
+
+
+def PlotExperimentData(wantBoxPlot):
 	trackCount = 7
 	weekAverage = False
 	experimentStart = datetime(2025, 7, 11, 6, 0)
@@ -454,8 +459,10 @@ def PlotExperimentData():
 	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
 	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
 	
-	expDaily = {k : v for k, v in daily.items() if k > experimentStart}
-	bigTimes, bigDaily, _, bigRange = GetBigData()
-	PlotWeekStats(bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
+	if wantBoxPlot:
+		expDaily = {k : v for k, v in daily.items() if k > experimentStart}
+		bigTimes, bigDaily, _, bigRange = GetBigData(True)
+		PlotWeekStats(bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
 
-PlotExperimentData()
+#PlotBigDataEveryWeek()
+PlotExperimentData(False)
