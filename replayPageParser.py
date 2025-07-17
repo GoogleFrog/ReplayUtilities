@@ -122,7 +122,7 @@ def PlotTimeline(times, dayAgg, data, minuteScale, weekAverage):
 	else:
 		title = "Maximum players in team games"
 	plt.title(
-		'{} by {}-minute period {} to {}. Counts in playerminutes (pm). Game counts include ≥ 5 minutes.'.format(
+		'{} by {}-minute period {} to {}. Counts in playerminutes (pm). Game counts include ≥ 5 minutes and ≥ 4 players.'.format(
 		title, minuteScale,
 		times[0].strftime('%D %H:%M'),
 		times[-1].strftime('%D %H:%M'),
@@ -189,7 +189,7 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 		for data in battles:
 			battleDay = GetDayEnd(data["start"], offset)
 			if battleDay in outputs:
-				if data["duration"] >= 5:
+				if data["duration"] >= 5 and data["players"] >= 4:
 					outputs[battleDay]["battleSizes"][data["players"]] += 1
 					outputs[battleDay]["battleDurations"][data["duration"]] += 1
 			else:
