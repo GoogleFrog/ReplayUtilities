@@ -2,10 +2,12 @@ from datetime import datetime, timedelta
 import heapq
 import math
 
+import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 from matplotlib.lines import Line2D
+import matplotlib.lines as mlines
 from matplotlib.patches import Patch
 import pandas as pd
 import numpy as np
@@ -79,6 +81,7 @@ def PlotTimeline(times, dayAgg, data, minuteScale, weekAverage):
 	plt.axhline(y=32, linestyle='-', color='red', linewidth=0.5)
 	plt.axhline(y=22, linestyle='-', color='red', linewidth=0.5)
 	ax.set_axisbelow(True)
+	print(list(dayAgg.values())[0]["end"])
 	ax.set_xlim(list(dayAgg.values())[0]["end"] - timedelta(hours=24), list(dayAgg.values())[-1]["end"])
 
 	colors = plt.rcParams['axes.prop_cycle'].by_key()['color'][:len(labels)]
@@ -88,7 +91,7 @@ def PlotTimeline(times, dayAgg, data, minuteScale, weekAverage):
 		ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 	else:
 		ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M %d/%m'))
-	ax.xaxis.set_major_locator(mdates.HourLocator(interval=6))
+	ax.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0, 24, 6)))
 
 	# Space for the labels at the top
 	ymin, ymax = ax.get_ylim()
@@ -111,7 +114,7 @@ def PlotTimeline(times, dayAgg, data, minuteScale, weekAverage):
 	handles = [Patch(facecolor=colors[i], label=label) for i, label in enumerate(labels[::-1])]
 	line_handle = Line2D([0], [0], color='black', linewidth=2, label='Spectators (smoothed)')
 	handles.append(line_handle)
-	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.835), fontsize=10)
+	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.835), fontsize=7)
 	if weekAverage:
 		title = "Average players in team games"
 	else:
@@ -271,9 +274,11 @@ def GetWeekAverage(playerCounts, daily, minuteScale, minTime):
 		if len(match) == 0:
 			weekDaily[day] = data.copy()
 			weekDaily[day]["copies"] = 1
+			weekDaily[day]["playerminutesList"] = [weekDaily[day]["playerminutes"]]
 		else:
 			match = match[0]
 			weekDaily[match]["playerminutes"] += data["playerminutes"]
+			weekDaily[match]["playerminutesList"].append(data["playerminutes"])
 			weekDaily[match]["battleSizes"] = [
 				x + y for (x, y) in zip(weekDaily[match]["battleSizes"], data["battleSizes"])]
 			weekDaily[match]["copies"] += 1
@@ -281,16 +286,84 @@ def GetWeekAverage(playerCounts, daily, minuteScale, minTime):
 	for day, data in weekDaily.items():
 		data["playerminutes"] /= data["copies"]
 		data["battleSizes"] = [x / data["copies"] for x in data["battleSizes"]]
+		dist = data["playerminutesList"]
 
 	return weekCounts, weekDaily, times
 
 
-def MakeTimeline(processed, trackCount, minuteScale, dayOffset, weekAverage):
+def PrintWeekStats(weekDaily):
+	for day, data in weekDaily.items():
+		print("{}: mean {:,.0f}, min {:,.0f}, 33rd {:,.0f}, 67th {:,.0f}, max {:,.0f}".format(
+			day.strftime('%A'),
+			np.mean(data["playerminutesList"]),
+			np.min(data["playerminutesList"]),
+			np.percentile(data["playerminutesList"], 33),
+			np.percentile(data["playerminutesList"], 67),
+			np.max(data["playerminutesList"])))
+
+
+def PlotWeekStats(weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
+	df = pd.DataFrame([
+		{"Day": (day - timedelta(hours=12)).strftime('%A'), "Player Minutes": pm}
+		for day, data in weekDaily.items()
+		for pm in data["playerminutesList"]
+	])
+	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
+	# Create the swarm plot
+	plt.figure(figsize=(10, 6))
+	ax = sns.boxplot(
+		data=df,
+		x="Day",
+		y="Player Minutes",
+		order=dayList,
+		width=0.3,
+		showcaps=True,
+		boxprops={'facecolor': 'lightgray', 'edgecolor': 'black'},
+		medianprops={'color': 'red'},
+		showfliers=False  # hide outliers to reduce overlap with swarm
+	)
+	ax.yaxis.set_major_locator(ticker.MultipleLocator(5000))
+	ax.yaxis.set_minor_locator(ticker.MultipleLocator(1000))
+	ax.grid(which='major', axis='y', linestyle='-', color='lightgray')
+	ax.grid(which='minor', axis='y', linestyle=':', color='lightgray')
+
+	sns.swarmplot(data=df, x="Day", y="Player Minutes", size=6, color="green")
+	if extraPoints is not False:
+		dfExtra = pd.DataFrame([
+			{"Day": (day - timedelta(hours=12)).strftime('%A'), "Player Minutes": data['playerminutes']}
+			for day, data in extraPoints.items()
+		])
+		sns.swarmplot(data=dfExtra, x="Day", y="Player Minutes", size=8, color="red")
+
+		red_dot = mlines.Line2D(
+			[], [], label='Experiment {} to {}'.format(extraTimes[0], extraTimes[-1]),
+			color='red', marker='o', linestyle='None', markersize=8, )
+		green_dot = mlines.Line2D(
+			[], [], label='Baseline {} to {}'.format(weekTimes[0], weekTimes[-1]),
+			color='green', marker='o', linestyle='None', markersize=8)
+		ax.legend(handles=[red_dot, green_dot], loc='upper left')
+
+	for i, day in enumerate(dayList):
+		values = df[df['Day'] == day]['Player Minutes'].explode().astype(float)
+		if not values.empty:
+			median = np.median(values)
+			ax.text(i + 0.2, median, "Median: {:,.0f}".format(median),
+				color='black', ha='left', va='center', fontsize=10)
+
+	plt.title("Player Minutes Distribution by Day. Box plots for baseline only.")
+	plt.ylabel("Player Minutes")
+	plt.xlabel("Day of Week")
+	plt.grid(True)
+	plt.tight_layout()
+	plt.show()
+
+
+def GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage):
 	minTime = False
 	maxTime = False
 	battleCount = {k : len(v) for k, v in processed.items()}
 	mostBattles = heapq.nlargest(trackCount, battleCount, key=battleCount.get)
-	print(processed.keys())
+	#print(processed.keys())
 
 	for title in mostBattles:
 		battles = processed[title]
@@ -316,18 +389,17 @@ def MakeTimeline(processed, trackCount, minuteScale, dayOffset, weekAverage):
 	averageCounts = MakeAverageCounts(processed, minTime, step, times, mostBattles)
 	maxCounts = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
 	daily = GetDailyValues(times, averageCounts, minuteScale, dayOffset, mostBattles, processed)
+	rawRange = [times[0], times[-1]]
 	if weekAverage:
-		weekCounts, weekDaily, weekTimes = GetWeekAverage(maxCounts, daily, minuteScale, minTime)
-		PlotTimeline(weekTimes, weekDaily, weekCounts, minuteScale, weekAverage)
-	else:
-		PlotTimeline(times, daily, maxCounts, minuteScale, weekAverage)
+		maxCounts, daily, times = GetWeekAverage(maxCounts, daily, minuteScale, minTime)
+	return times, daily, maxCounts, rawRange
 
 
 def ProcessReplayFiles(files, filterOut):
+	processed = {}
 	for file in files:
 		with open(file) as file:
 			lines = []
-			processed = {}
 			for line in file:
 				line = line.rstrip()
 				if line != "":
@@ -339,12 +411,6 @@ def ProcessReplayFiles(files, filterOut):
 		battles.sort(key=SortBattles)
 	return processed
 
-#file = "paste13_06_25_to_13_07_25.txt"
-files = ["early.txt"]
-trackCount = 6
-minuteScale = 10
-dayOffset = 6
-weekAverage = False
 
 filterOut = [
 	"[A] Pro 1v1 Host",
@@ -353,7 +419,34 @@ filterOut = [
 	"[A] Units Level Up",
 	"[A] Arena Mod",
 ]
+minuteScale = 10
+dayOffset = 6
 
-processed = ProcessReplayFiles(files, filterOut)
-#MakeBattleList(processed)
-MakeTimeline(processed, trackCount, minuteScale, dayOffset, weekAverage)
+def GetBigData():
+	trackCount = 5
+	weekAverage = True
+	processed = ProcessReplayFiles(["big.txt", "janFeb.txt"], filterOut)
+	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
+	return times, daily, counts, rawRange
+
+
+def PlotBigData():
+	weekAverage = True
+	times, daily, counts, rawRange = GetBigData()
+	PlotWeekStats(daily)
+	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
+
+
+def PlotExperimentData():
+	trackCount = 7
+	weekAverage = False
+	experimentStart = datetime(2025, 7, 11, 6, 0)
+	processed = ProcessReplayFiles(["early.txt"], filterOut)
+	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
+	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
+	
+	expDaily = {k : v for k, v in daily.items() if k > experimentStart}
+	bigTimes, bigDaily, _, bigRange = GetBigData()
+	PlotWeekStats(bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
+
+PlotExperimentData()
