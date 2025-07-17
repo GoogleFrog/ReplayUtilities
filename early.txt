@@ -1,4 +1,45 @@
 
+[A] Teams All Welcome #4
+Teams: 2v2
+Banana Republic v1.0.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	3
+Date: 	7/17/2025 5:29:06 AM (78 minutes ago)
+Duration: 	28 minutes
+[A] Teams All Welcome #4
+Teams: 3v3
+TitanDuel 2.2 (Zero-K v1.13.6.4)
+	
+Players: 	6
+Spectators: 	3
+Date: 	7/17/2025 5:03:15 AM (104 minutes ago)
+Duration: 	17 minutes
+[A] Teams All Welcome #4
+Teams: 2v2
+Wanderlust v03 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	5
+Date: 	7/17/2025 4:52:55 AM (115 minutes ago)
+Duration: 	8 minutes
+[A] Teams All Welcome #4
+Teams: 2v2
+Banana Republic v1.0.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	4
+Date: 	7/17/2025 4:41:00 AM (2 hours ago)
+Duration: 	7 minutes
+[A] Teams All Welcome #4
+Teams: 5v5
+Scorched Crossing v2.5 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	8
+Date: 	7/17/2025 4:20:22 AM (2 hours ago)
+Duration: 	13 minutes 
+
 [A] COOP vs AI
 Teams: 1 + Bots
 Desolation v1 (Zero-K v1.13.6.4)

@@ -99,22 +99,24 @@ def PlotTimeline(times, dayAgg, data, minuteScale, weekAverage):
 
 	# Add vertical lines and labels
 	for dayData in dayAgg.values():
+		duration = sum([count*i for i, count in enumerate(dayData["battleSizes"])]) / sum(dayData["battleSizes"])
 		ax.axvline(x=dayData["end"], color='black', linestyle='--', linewidth=0.5)
 		ax.text(dayData["start"] + timedelta(hours=2), ax.get_ylim()[1] - 1,
-			"{}\n{:,.0f} pm\n{:,.0f} games\n{:,.0f} with ≥ 16\n{:,.0f} with ≥ 22\n{:,.0f} with ≤ 10".format(
+			"{}\n{:,.0f} pm\n{:,.0f} games\n{:,.1f} ave dur\n{:,.0f} with ≥ 16\n{:,.0f} with ≥ 22\n{:,.0f} with ≤ 10".format(
 				(dayData["end"] - timedelta(hours=12)).strftime('%A'),
 				dayData["playerminutes"],
 				sum(dayData["battleSizes"]),
-				sum(dayData["battleSizes"][16::]),
-				sum(dayData["battleSizes"][22::]),
-				sum(dayData["battleSizes"][::10])),
+				duration,
+				sum(dayData["battleSizes"][16:]),
+				sum(dayData["battleSizes"][22:]),
+				sum(dayData["battleSizes"][:10])),
 			rotation=0, verticalalignment='top', horizontalalignment='left',
 			backgroundcolor='white', fontsize=10)
 
 	handles = [Patch(facecolor=colors[i], label=label) for i, label in enumerate(labels[::-1])]
 	line_handle = Line2D([0], [0], color='black', linewidth=2, label='Spectators (smoothed)')
 	handles.append(line_handle)
-	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.835), fontsize=7)
+	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.82), fontsize=7)
 	if weekAverage:
 		title = "Average players in team games"
 	else:
@@ -165,6 +167,7 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 				"end" : nextDay, 
 				"playerminutes" : playerAcc*step,
 				"battleSizes" : [0] * 40,
+				"battleDurations" : [0] * 200,
 			}
 			nextDay = GetDayEnd(time, offset)
 			lastTime = time
@@ -178,6 +181,7 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 		"end" : time, 
 		"playerminutes" : playerAcc*step,
 		"battleSizes" : [0] * 40,
+		"battleDurations" : [0] * 200,
 	}
 
 	for title in mostBattles:
@@ -187,6 +191,7 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 			if battleDay in outputs:
 				if data["duration"] >= 5:
 					outputs[battleDay]["battleSizes"][data["players"]] += 1
+					outputs[battleDay]["battleDurations"][data["duration"]] += 1
 			else:
 				print("Missing battle day {}".format(battleDay))
 
@@ -281,11 +286,14 @@ def GetWeekAverage(playerCounts, daily, minuteScale, minTime):
 			weekDaily[match]["playerminutesList"].append(data["playerminutes"])
 			weekDaily[match]["battleSizes"] = [
 				x + y for (x, y) in zip(weekDaily[match]["battleSizes"], data["battleSizes"])]
+			weekDaily[match]["battleDurations"] = [
+				x + y for (x, y) in zip(weekDaily[match]["battleDurations"], data["battleDurations"])]
 			weekDaily[match]["copies"] += 1
 
 	for day, data in weekDaily.items():
 		data["playerminutes"] /= data["copies"]
 		data["battleSizes"] = [x / data["copies"] for x in data["battleSizes"]]
+		data["battleDurations"] = [x / data["copies"] for x in data["battleDurations"]]
 		dist = data["playerminutesList"]
 
 	return weekCounts, weekDaily, times
@@ -442,6 +450,7 @@ def PlotExperimentData():
 	weekAverage = False
 	experimentStart = datetime(2025, 7, 11, 6, 0)
 	processed = ProcessReplayFiles(["early.txt"], filterOut)
+	#MakeBattleList(processed)
 	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
 	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
 	
