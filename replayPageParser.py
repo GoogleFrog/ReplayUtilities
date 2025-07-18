@@ -465,4 +465,4 @@ def PlotExperimentData(wantBoxPlot):
 		PlotWeekStats(bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
 
 #PlotBigDataEveryWeek()
-PlotExperimentData(False)
+PlotExperimentData(True)

@@ -1,5 +1,392 @@
 
 [A] Teams All Welcome #4
+Teams: 1v1
+Hooked 1.1 (Zero-K v1.13.6.4)
+	
+Players: 	2
+Spectators: 	5
+Date: 	7/18/2025 7:39:37 AM (19 minutes ago)
+Duration: 	4 minutes
+[A] Teams All Welcome #4
+Teams: 3v3
+Copper Hill v1 (Zero-K v1.13.6.4)
+	
+Players: 	6
+Spectators: 	1
+Date: 	7/18/2025 6:43:30 AM (75 minutes ago)
+Duration: 	10 minutes
+[A] Teams All Welcome #4
+Teams: 3v3
+DunePatrolRedux v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	6
+Spectators: 	3
+Date: 	7/18/2025 6:21:40 AM (97 minutes ago)
+Duration: 	18 minutes
+[A] Teams All Welcome #4
+Teams: 2v2
+Desert Rumble 1.02 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	3
+Date: 	7/18/2025 6:09:02 AM (110 minutes ago)
+Duration: 	10 minutes
+[A] Teams All Welcome #4
+Teams: 2v2
+Vantage v1.2 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	3
+Date: 	7/18/2025 5:28:50 AM (2 hours ago)
+Duration: 	20 minutes
+[A] Teams All Welcome #4
+Teams: 2v2
+Banana Republic v1.0.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	7
+Date: 	7/18/2025 5:02:41 AM (2 hours ago)
+Duration: 	19 minutes
+[A] Future Wars Coop
+Teams: 4 + Bots
+Entrenched_Plains_V2 (Future Wars v0.42.0 RC-9)
+	
+Players: 	4
+Spectators: 	0
+Date: 	7/18/2025 2:49:55 AM (5 hours ago)
+Duration: 	0 seconds
+[A] Future Wars Coop
+Teams: 1 + Bots
+Dockside v2 (Future Wars v0.42.0 RC-9)
+	
+Players: 	1
+Spectators: 	1
+Date: 	7/18/2025 2:46:34 AM (5 hours ago)
+Duration: 	0 seconds
+[A] Niobium (Giant rank & lower)
+Teams: 1v1
+IsisDelta_v02 (Zero-K v1.13.6.4)
+	
+Players: 	2
+Spectators: 	0
+Date: 	7/18/2025 1:30:44 AM (6 hours ago)
+Duration: 	27 minutes 
+
+[A] Teams All Welcome #4
+Teams: 5v5
+Canis River v1.4 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	6
+Date: 	7/18/2025 12:30:36 AM (19 minutes ago)
+Duration: 	14 minutes
+[A] Teams All Welcome #4
+Teams: 5v5
+Tau12 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	5
+Date: 	7/18/2025 12:14:02 AM (35 minutes ago)
+Duration: 	13 minutes
+[A] Teams All Welcome #4
+Teams: 6v6
+Otago 1.4 (Zero-K v1.13.6.4)
+	
+Players: 	12
+Spectators: 	5
+Date: 	7/17/2025 11:54:18 PM (55 minutes ago)
+Duration: 	16 minutes
+[A] Teams All Welcome #4
+Teams: 6v6
+Banana Republic v1.0.1 (Zero-K v1.13.6.4)
+	
+Players: 	12
+Spectators: 	8
+Date: 	7/17/2025 11:44:13 PM (65 minutes ago)
+Duration: 	6 minutes
+[A] Teams All Welcome #4
+Teams: 4v4
+Tabula_Remake 1.5 (Zero-K v1.13.6.4)
+	
+Players: 	8
+Spectators: 	6
+Date: 	7/17/2025 11:36:28 PM (73 minutes ago)
+Duration: 	4 minutes 
+
+[A] Teams All Welcome #4
+Teams: 5v4
+Theta Crystals 1.0 (Zero-K v1.13.6.4)
+	
+Players: 	9
+Spectators: 	6
+Date: 	7/17/2025 11:04:44 PM (34 minutes ago)
+Duration: 	26 minutes
+[A] Teams All Welcome #4
+Teams: 2v3
+LimeQuat Republic v1.24 (Zero-K v1.13.6.4)
+	
+Players: 	5
+Spectators: 	2
+Date: 	7/17/2025 10:45:25 PM (53 minutes ago)
+Duration: 	16 minutes
+[A] Teams All Welcome #4
+Teams: 4v3
+Highway 95 West v2.1 (Zero-K v1.13.6.4)
+	
+Players: 	7
+Spectators: 	2
+Date: 	7/17/2025 10:30:34 PM (68 minutes ago)
+Duration: 	11 minutes
+[A] Teams All Welcome #4
+Teams: 2v2
+Living Lands 4.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	4
+Date: 	7/17/2025 10:10:03 PM (89 minutes ago)
+Duration: 	16 minutes
+[A] Teams All Welcome #4
+Teams: 1v1
+Icy Run v2 (Zero-K v1.13.6.4)
+	
+Players: 	2
+Spectators: 	2
+Date: 	7/17/2025 10:03:35 PM (95 minutes ago)
+Duration: 	3 minutes
+[A] Teams All Welcome
+Teams: 5v5
+Fields_Of_Isis (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	5
+Date: 	7/17/2025 9:24:03 PM (2 hours ago)
+Duration: 	2 minutes
+[A] Units Level Up
+Teams: 1 + Bots
+SiberianDivide 1.1 (Unit Level Ups v79)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/17/2025 9:00:32 PM (2 hours ago)
+Duration: 	0 seconds
+[A] Units Level Up
+Teams: 1 + Bots
+SiberianDivide 1.1 (Unit Level Ups v79)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/17/2025 8:58:44 PM (2 hours ago)
+Duration: 	0 seconds
+[A] Units Level Up
+Teams: 1 + Bots
+SiberianDivide 1.1 (Unit Level Ups v79)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/17/2025 8:53:48 PM (2 hours ago)
+Duration: 	0 seconds
+[A] Teams All Welcome
+Teams: 10v10
+LimeQuat Republic v1.24 (Zero-K v1.13.6.4)
+	
+Players: 	20
+Spectators: 	9
+Date: 	7/17/2025 8:51:36 PM (2 hours ago)
+Duration: 	25 minutes
+[A] Teams All Welcome #4
+Teams: 5v5
+Rainbow Comet v1.25 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	6
+Date: 	7/17/2025 8:39:52 PM (2 hours ago)
+Duration: 	31 minutes
+[A] Teams All Welcome
+Teams: 9v9
+Comet Catcher Redux v3.1 (Zero-K v1.13.6.4)
+	
+Players: 	18
+Spectators: 	12
+Date: 	7/17/2025 8:16:48 PM (3 hours ago)
+Duration: 	28 minutes
+[A] Teams All Welcome #4
+Teams: 8v9
+Supreme Strait v1.3 (Zero-K v1.13.6.4)
+	
+Players: 	17
+Spectators: 	10
+Date: 	7/17/2025 8:06:50 PM (3 hours ago)
+Duration: 	28 minutes
+[A] Teams All Welcome
+Teams: 7v7
+Hexian Arena v3 (Zero-K v1.13.6.4)
+	
+Players: 	14
+Spectators: 	10
+Date: 	7/17/2025 8:01:43 PM (3 hours ago)
+Duration: 	11 minutes
+[A] Teams All Welcome #4
+Teams: 11v11
+FolsomDamDeluxeV4 (Zero-K v1.13.6.4)
+	
+Players: 	22
+Spectators: 	9
+Date: 	7/17/2025 7:42:14 PM (3 hours ago)
+Duration: 	20 minutes
+[A] Teams All Welcome
+Teams: 5v5
+FolsomDamDeluxeV4 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	9
+Date: 	7/17/2025 7:41:26 PM (3 hours ago)
+Duration: 	16 minutes
+[A] Teams All Welcome #4
+Teams: 10v11
+Banana Republic v1.0.1 (Zero-K v1.13.6.4)
+	
+Players: 	21
+Spectators: 	7
+Date: 	7/17/2025 7:28:11 PM (4 hours ago)
+Duration: 	9 minutes
+[A] Teams All Welcome
+Teams: 5v5
+Cobalt Dream v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	6
+Date: 	7/17/2025 7:19:47 PM (4 hours ago)
+Duration: 	13 minutes
+[A] Teams All Welcome
+Teams: 4v4
+Desolation v1 (Zero-K v1.13.6.4)
+	
+Players: 	8
+Spectators: 	5
+Date: 	7/17/2025 7:07:53 PM (4 hours ago)
+Duration: 	6 minutes
+[A] Teams All Welcome #4
+Teams: 9v9
+Akilon Wastelands ZK v1 (Zero-K v1.13.6.4)
+	
+Players: 	18
+Spectators: 	8
+Date: 	7/17/2025 7:05:54 PM (4 hours ago)
+Duration: 	18 minutes
+[A] Teams All Welcome
+Teams: 2v2
+CrossRoads v1.0.3 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	1
+Date: 	7/17/2025 6:56:22 PM (4 hours ago)
+Duration: 	7 minutes
+[A] Teams All Welcome
+Teams: 2v2
+Scaryland v1.02 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	1
+Date: 	7/17/2025 6:51:59 PM (4 hours ago)
+Duration: 	0 seconds
+[A] Teams All Welcome #4
+Teams: 11v11
+FrostBiteV2 (Zero-K v1.13.6.4)
+	
+Players: 	22
+Spectators: 	12
+Date: 	7/17/2025 6:38:17 PM (5 hours ago)
+Duration: 	21 minutes
+[A] Teams All Welcome
+Teams: 2v2
+Intersection v4.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	2
+Date: 	7/17/2025 6:32:04 PM (5 hours ago)
+Duration: 	14 minutes
+[A] Teams All Welcome #4
+Teams: 11v11
+Nuclear_Winter_v1 (Zero-K v1.13.6.4)
+	
+Players: 	22
+Spectators: 	13
+Date: 	7/17/2025 6:23:18 PM (5 hours ago)
+Duration: 	10 minutes
+[A] Teams All Welcome #4
+Teams: 10v10
+The Hole v5 (Zero-K v1.13.6.4)
+	
+Players: 	20
+Spectators: 	12
+Date: 	7/17/2025 5:58:26 PM (5 hours ago)
+Duration: 	20 minutes
+[A] Teams All Welcome #4
+Teams: 9v8
+Supreme Strait v1.3 (Zero-K v1.13.6.4)
+	
+Players: 	17
+Spectators: 	8
+Date: 	7/17/2025 5:34:49 PM (6 hours ago)
+Duration: 	19 minutes
+[A] Teams All Welcome #4
+Teams: 9v9
+StormSiege_v3 (Zero-K v1.13.6.4)
+	
+Players: 	18
+Spectators: 	10
+Date: 	7/17/2025 4:59:42 PM (6 hours ago)
+Duration: 	29 minutes
+[A] Teams All Welcome #4
+Teams: 9v9
+Hera Planum 0.91 (Zero-K v1.13.6.4)
+	
+Players: 	18
+Spectators: 	7
+Date: 	7/17/2025 4:37:31 PM (7 hours ago)
+Duration: 	15 minutes
+[A] Teams All Welcome #4
+Teams: 7v7
+Verdant v4 (Zero-K v1.13.6.4)
+	
+Players: 	14
+Spectators: 	10
+Date: 	7/17/2025 4:20:15 PM (7 hours ago)
+Duration: 	11 minutes
+[A] Teams All Welcome #4
+Teams: 6v7
+Tabula-v6.1 (Zero-K v1.13.6.4)
+	
+Players: 	13
+Spectators: 	6
+Date: 	7/17/2025 3:54:56 PM (7 hours ago)
+Duration: 	20 minutes
+[A] Teams All Welcome #4
+Teams: 7v7
+LimeQuat Republic v1.24 (Zero-K v1.13.6.4)
+	
+Players: 	14
+Spectators: 	6
+Date: 	7/17/2025 3:30:10 PM (8 hours ago)
+Duration: 	17 minutes
+[A] Teams All Welcome #4
+Teams: 8v9
+Absolution 2 (Zero-K v1.13.6.4)
+	
+Players: 	17
+Spectators: 	5
+Date: 	7/17/2025 3:09:35 PM (8 hours ago)
+Duration: 	16 minutes
+[A] Teams All Welcome #4
+Teams: 8v8
+White Fire Remake 1.3 (Zero-K v1.13.6.4)
+	
+Players: 	16
+Spectators: 	6
+Date: 	7/17/2025 2:52:43 PM (8 hours ago)
+Duration: 	11 minutes 
+
+[A] Teams All Welcome #4
 Teams: 6v6
 DeltaSiegeDry Deluxe V3 (Zero-K v1.13.6.4)
 	
