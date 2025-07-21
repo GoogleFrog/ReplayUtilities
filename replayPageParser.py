@@ -454,7 +454,7 @@ def PlotExperimentData(wantBoxPlot):
 	trackCount = 7
 	weekAverage = False
 	experimentStart = datetime(2025, 7, 11, 6, 0)
-	processed = ProcessReplayFiles(["early.txt"], filterOut)
+	processed = ProcessReplayFiles(["early2.txt"], filterOut)
 	#MakeBattleList(processed)
 	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
 	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
