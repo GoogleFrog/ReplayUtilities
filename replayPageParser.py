@@ -341,19 +341,19 @@ def PrintWeekStats(weekDaily):
 			np.max(data["playerminutesList"])))
 
 
-def MakeBoxplot(metricName, dayList, df, mainTimes, dfExtra, extraTimes):
+def MakeBoxplot(xAxis, metricName, dayList, df, mainTimes, dfExtra, extraTimes, swarm):
 	# Create the swarm plot
-	plt.figure(figsize=(10, 6))
+	plt.figure(figsize=(18, 9))
 	ax = sns.boxplot(
 		data=df,
-		x="Day",
+		x=xAxis,
 		y=metricName,
 		order=dayList,
 		width=0.3,
 		showcaps=True,
 		boxprops={'facecolor': 'lightgray', 'edgecolor': 'black'},
-		medianprops={'color': 'red'},
-		showfliers=False  # hide outliers to reduce overlap with swarm
+		medianprops={'color': 'green'},
+		showfliers=not swarm  # hide outliers to reduce overlap with swarm
 	)
 	if df[metricName].max() > 1:
 		ax.yaxis.set_major_locator(ticker.MultipleLocator(5000))
@@ -363,12 +363,15 @@ def MakeBoxplot(metricName, dayList, df, mainTimes, dfExtra, extraTimes):
 		ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
 		ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.02))
 		medianStr = "Median: {:,.2f}"
+		ax.set_ylim(0, 1)
 	ax.grid(which='major', axis='y', linestyle='-', color='lightgray')
 	ax.grid(which='minor', axis='y', linestyle=':', color='lightgray')
+	plt.xticks(rotation=90)
 
-	sns.swarmplot(data=df, x="Day", y=metricName, size=6, color="green")
+	if swarm:
+		sns.swarmplot(data=df, x=xAxis, y=metricName, size=5, color="green")
 	if dfExtra is not False:
-		sns.swarmplot(data=dfExtra, x="Day", y=metricName, size=8, color="red")
+		sns.swarmplot(data=dfExtra, x=xAxis, y=metricName, size=8, color="red")
 
 		red_dot = mlines.Line2D(
 			[], [], label='Experiment {} to {}'.format(extraTimes[0], extraTimes[-1]),
@@ -408,18 +411,19 @@ def PlotWeekStats(weekDaily, weekTimes=False, extraPoints=False, extraTimes=Fals
 		])
 	else:
 		dfExtra = False
-	MakeBoxplot(metricName, dayList, df, weekTimes, dfExtra, extraTimes)
+	MakeBoxplot("Day", metricName, dayList, df, weekTimes, dfExtra, extraTimes, True)
 
 
-def PlotGameUptime(sizeThreshold, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
-	metricName = "Proportion of day with ≥ {} players in team games".format(sizeThreshold)
+def GetMetricDf(
+		sizeThreshold, metricName, metricKey,
+		weekDaily, weekTimes, extraPoints, extraTimes):
 	df = pd.DataFrame([
 		{
 			"Day": (day - timedelta(hours=12)).strftime('%A'), 
 			metricName: CountThresholdProp(dayTimeline, sizeThreshold)
 		}
 		for day, data in weekDaily.items()
-		for dayTimeline in data["dayTimelineList"]
+		for dayTimeline in data["{}List".format(metricKey)]
 	])
 	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
 
@@ -427,36 +431,58 @@ def PlotGameUptime(sizeThreshold, weekDaily, weekTimes=False, extraPoints=False,
 		dfExtra = pd.DataFrame([
 			{
 				"Day": (day - timedelta(hours=12)).strftime('%A'),
-				metricName:  CountThresholdProp(data['dayTimeline'], sizeThreshold)}
+				metricName:  CountThresholdProp(data[metricKey], sizeThreshold)}
 			for day, data in extraPoints.items()
 		])
 	else:
 		dfExtra = False
-	MakeBoxplot(metricName, dayList, df, weekTimes, dfExtra, extraTimes)
+	return df, dfExtra
 
 
-def PlotGameSizeUptime(sizeThreshold, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
-	metricName = "Proportion of day with games of ≥ {} players".format(sizeThreshold)
-	df = pd.DataFrame([
-		{
-			"Day": (day - timedelta(hours=12)).strftime('%A'), 
-			metricName: CountThresholdProp(dayTimeline, sizeThreshold)
-		}
-		for day, data in weekDaily.items()
-		for dayTimeline in data["dayMaxList"]
-	])
+def PlotGameUptime(gameSizes, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
+	metricKey = "dayTimeline"
+	metricName = "Proportion of time with at least N players playing across all team games"
+	dfList = []
+	dfExtraList = []
+	for sizeThreshold in gameSizes:
+		df, dfExtra = GetMetricDf(
+			sizeThreshold, metricName, metricKey, weekDaily, weekTimes, extraPoints, extraTimes)
+		df["Size"] = sizeThreshold
+		dfExtra["Size"] = sizeThreshold
+		dfList.append(df)
+		dfExtraList.append(dfExtra)
+	df = pd.concat(dfList, ignore_index=True)
+	dfExtra = pd.concat(dfExtraList, ignore_index=True)
+	xAxis = "DaySize"
+	df[xAxis] = df["Day"] + "\nplayers ≥ " + df["Size"].astype(str)
+	dfExtra[xAxis] = dfExtra["Day"] + "\nplayers ≥ " + dfExtra["Size"].astype(str)
+
 	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
+	dayList = ["{}\nplayers ≥ {}".format(day, size) for day in dayList for size in gameSizes]
+	MakeBoxplot(xAxis, metricName, dayList, df, weekTimes, dfExtra, extraTimes, False)
 
-	if extraPoints is not False:
-		dfExtra = pd.DataFrame([
-			{
-				"Day": (day - timedelta(hours=12)).strftime('%A'),
-				metricName:  CountThresholdProp(data['dayMax'], sizeThreshold)}
-			for day, data in extraPoints.items()
-		])
-	else:
-		dfExtra = False
-	MakeBoxplot(metricName, dayList, df, weekTimes, dfExtra, extraTimes)
+
+def PlotGameSizeUptime(gameSizes, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
+	metricKey = "dayMax"
+	metricName = "Proportion of the day where a team game of size ≥ N is running"
+	dfList = []
+	dfExtraList = []
+	for sizeThreshold in gameSizes:
+		df, dfExtra = GetMetricDf(
+			sizeThreshold, metricName, metricKey, weekDaily, weekTimes, extraPoints, extraTimes)
+		df["Size"] = sizeThreshold
+		dfExtra["Size"] = sizeThreshold
+		dfList.append(df)
+		dfExtraList.append(dfExtra)
+	df = pd.concat(dfList, ignore_index=True)
+	dfExtra = pd.concat(dfExtraList, ignore_index=True)
+	xAxis = "DaySize"
+	df[xAxis] = df["Day"] + "\nsize ≥ " + df["Size"].astype(str)
+	dfExtra[xAxis] = dfExtra["Day"] + "\nsize ≥ " + dfExtra["Size"].astype(str)
+
+	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
+	dayList = ["{}\nsize ≥ {}".format(day, size) for day in dayList for size in gameSizes]
+	MakeBoxplot(xAxis, metricName, dayList, df, weekTimes, dfExtra, extraTimes, False)
 
 
 def GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage):
@@ -551,7 +577,7 @@ def PlotBigDataEveryWeek():
 
 def PlotExperimentData(wantBoxPlot):
 	trackCount = 10
-	gameUpSizes = [8, 16, 22]
+	gameUpSizes = [8, 16, 22, 32]
 	weekAverage = False
 	experimentStart = datetime(2025, 7, 11, 6, 0)
 	processed = ProcessReplayFiles(["early2.txt", "customNonsense.txt"], filterOut)
@@ -563,9 +589,8 @@ def PlotExperimentData(wantBoxPlot):
 		expDaily = {k : v for k, v in daily.items() if k > experimentStart}
 		bigTimes, bigDaily, bigCounts, bigRange = GetBigData(True)
 		PlotWeekStats(bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
-		for size in gameUpSizes:
-			PlotGameUptime(size, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
-			PlotGameSizeUptime(size, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
+		PlotGameSizeUptime(gameUpSizes, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
+		PlotGameUptime(gameUpSizes, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
 
 #PlotBigDataEveryWeek()
 PlotExperimentData(True)
