@@ -160,15 +160,16 @@ def GetDayEnd(time, offset):
 	return (time - timedelta(hours=offset)).replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)
 
 
-def FlattenTimelines(data, startIndex, index, mode):
+def FlattenTimelines(counts, startIndex, index, mode):
 	dayTimeline = False
-	for data in data.values():
-		if dayTimeline is False:
-			dayTimeline = [0] * len(data[startIndex:index])
-		if mode == 'sum':
-			dayTimeline = [x + y for x, y in zip(dayTimeline, data[startIndex:index])]
-		elif mode == 'max':
-			dayTimeline = [max(x, y) for x, y in zip(dayTimeline, data[startIndex:index])]
+	for key, data in counts.items():
+		if key != "specs":
+			if dayTimeline is False:
+				dayTimeline = [0] * len(data[startIndex:index])
+			if mode == 'sum':
+				dayTimeline = [x + y for x, y in zip(dayTimeline, data[startIndex:index])]
+			elif mode == 'max':
+				dayTimeline = [max(x, y) for x, y in zip(dayTimeline, data[startIndex:index])]
 	return dayTimeline
 
 
@@ -431,7 +432,7 @@ def GetMetricDf(
 		dfExtra = pd.DataFrame([
 			{
 				"Day": (day - timedelta(hours=12)).strftime('%A'),
-				metricName:  CountThresholdProp(data[metricKey], sizeThreshold)}
+				metricName: CountThresholdProp(data[metricKey], sizeThreshold)}
 			for day, data in extraPoints.items()
 		])
 	else:
@@ -439,7 +440,7 @@ def GetMetricDf(
 	return df, dfExtra
 
 
-def PlotGameUptime(gameSizes, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
+def PlotPlayerThresholdUptime(gameSizes, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
 	metricKey = "dayTimeline"
 	metricName = "Proportion of time with at least N players playing across all team games"
 	dfList = []
@@ -590,7 +591,7 @@ def PlotExperimentData(wantBoxPlot):
 		bigTimes, bigDaily, bigCounts, bigRange = GetBigData(True)
 		PlotWeekStats(bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
 		PlotGameSizeUptime(gameUpSizes, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
-		PlotGameUptime(gameUpSizes, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
+		PlotPlayerThresholdUptime(gameUpSizes, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
 
 #PlotBigDataEveryWeek()
 PlotExperimentData(True)
