@@ -48,6 +48,14 @@ def RollingAverage(data, windowSize):
 	return padding + list(smoothed) + padding
 
 
+def CountThresholdProp(timeline, threshold):
+	count = 0
+	for value in timeline:
+		if value >= threshold:
+			count += 1
+	return count / len(timeline)
+
+
 def SortBattles(a):
 	return a["start"]
 
@@ -116,7 +124,7 @@ def PlotTimeline(times, dayAgg, data, minuteScale, weekAverage):
 	handles = [Patch(facecolor=colors[i], label=label) for i, label in enumerate(labels[::-1])]
 	line_handle = Line2D([0], [0], color='black', linewidth=2, label='Spectators (smoothed)')
 	handles.append(line_handle)
-	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.82), fontsize=7)
+	ax.legend(handles=handles, loc='upper left', bbox_to_anchor=(0.01, 0.8), fontsize=7)
 	if weekAverage:
 		title = "Average players in team games"
 	else:
@@ -147,24 +155,41 @@ def PrintTimeline(minTime, maxTime, minuteScale, playerLists):
 		time = time + timedelta(minutes=minuteScale)
 		index = index + 1
 
+
 def GetDayEnd(time, offset):
 	return (time - timedelta(hours=offset)).replace(hour=0, minute=0, second=0) + timedelta(hours=offset + 24)
 
-def GetDailyValues(times, data, step, offset, mostBattles, processed):
-	data = data.copy()
-	del data["specs"]
+
+def FlattenTimelines(data, startIndex, index, mode):
+	dayTimeline = False
+	for data in data.values():
+		if dayTimeline is False:
+			dayTimeline = [0] * len(data[startIndex:index])
+		if mode == 'sum':
+			dayTimeline = [x + y for x, y in zip(dayTimeline, data[startIndex:index])]
+		elif mode == 'max':
+			dayTimeline = [max(x, y) for x, y in zip(dayTimeline, data[startIndex:index])]
+	return dayTimeline
+
+
+def GetDailyValues(times, maxData, averageData, step, offset, mostBattles, processed):
+	averageData = averageData.copy()
+	del averageData["specs"]
 
 	outputs = {}
 	nextDay = GetDayEnd(times[0], offset)
 	lastTime = times[0]
 	index = 0
 	playerAcc = 0
+	startIndex = 0
 	gameAcc = 0
 	for time in times:
 		if time >= nextDay:
 			outputs[nextDay] = {
 				"start" : lastTime,
 				"end" : nextDay, 
+				"dayTimeline" : FlattenTimelines(maxData, startIndex, index, 'sum'),
+				"dayMax" : FlattenTimelines(maxData, startIndex, index, 'max'),
 				"playerminutes" : playerAcc*step,
 				"battleSizes" : [0] * 40,
 				"battleDurations" : [0] * 200,
@@ -172,13 +197,16 @@ def GetDailyValues(times, data, step, offset, mostBattles, processed):
 			nextDay = GetDayEnd(time, offset)
 			lastTime = time
 			playerAcc = 0
-		for count in data.values():
+			startIndex = index
+		for count in averageData.values():
 			playerAcc += count[index]
 		index += 1
 	
 	outputs[nextDay] = {
 		"start" : lastTime,
 		"end" : time, 
+		"dayTimeline" : FlattenTimelines(maxData, startIndex, index, 'sum'),
+		"dayMax" : FlattenTimelines(maxData, startIndex, index, 'max'),
 		"playerminutes" : playerAcc*step,
 		"battleSizes" : [0] * 40,
 		"battleDurations" : [0] * 200,
@@ -280,10 +308,14 @@ def GetWeekAverage(playerCounts, daily, minuteScale, minTime):
 			weekDaily[day] = data.copy()
 			weekDaily[day]["copies"] = 1
 			weekDaily[day]["playerminutesList"] = [weekDaily[day]["playerminutes"]]
+			weekDaily[day]["dayTimelineList"] = [weekDaily[day]["dayTimeline"]]
+			weekDaily[day]["dayMaxList"] = [weekDaily[day]["dayMax"]]
 		else:
 			match = match[0]
 			weekDaily[match]["playerminutes"] += data["playerminutes"]
 			weekDaily[match]["playerminutesList"].append(data["playerminutes"])
+			weekDaily[match]["dayTimelineList"].append(data["dayTimeline"])
+			weekDaily[match]["dayMaxList"].append(data["dayMax"])
 			weekDaily[match]["battleSizes"] = [
 				x + y for (x, y) in zip(weekDaily[match]["battleSizes"], data["battleSizes"])]
 			weekDaily[match]["battleDurations"] = [
@@ -294,7 +326,6 @@ def GetWeekAverage(playerCounts, daily, minuteScale, minTime):
 		data["playerminutes"] /= data["copies"]
 		data["battleSizes"] = [x / data["copies"] for x in data["battleSizes"]]
 		data["battleDurations"] = [x / data["copies"] for x in data["battleDurations"]]
-		dist = data["playerminutesList"]
 
 	return weekCounts, weekDaily, times
 
@@ -310,19 +341,13 @@ def PrintWeekStats(weekDaily):
 			np.max(data["playerminutesList"])))
 
 
-def PlotWeekStats(weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
-	df = pd.DataFrame([
-		{"Day": (day - timedelta(hours=12)).strftime('%A'), "Player Minutes": pm}
-		for day, data in weekDaily.items()
-		for pm in data["playerminutesList"]
-	])
-	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
+def MakeBoxplot(metricName, dayList, df, mainTimes, dfExtra, extraTimes):
 	# Create the swarm plot
 	plt.figure(figsize=(10, 6))
 	ax = sns.boxplot(
 		data=df,
 		x="Day",
-		y="Player Minutes",
+		y=metricName,
 		order=dayList,
 		width=0.3,
 		showcaps=True,
@@ -330,40 +355,108 @@ def PlotWeekStats(weekDaily, weekTimes=False, extraPoints=False, extraTimes=Fals
 		medianprops={'color': 'red'},
 		showfliers=False  # hide outliers to reduce overlap with swarm
 	)
-	ax.yaxis.set_major_locator(ticker.MultipleLocator(5000))
-	ax.yaxis.set_minor_locator(ticker.MultipleLocator(1000))
+	if df[metricName].max() > 1:
+		ax.yaxis.set_major_locator(ticker.MultipleLocator(5000))
+		ax.yaxis.set_minor_locator(ticker.MultipleLocator(1000))
+		medianStr = "Median: {:,.0f}"
+	else:
+		ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
+		ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.02))
+		medianStr = "Median: {:,.2f}"
 	ax.grid(which='major', axis='y', linestyle='-', color='lightgray')
 	ax.grid(which='minor', axis='y', linestyle=':', color='lightgray')
 
-	sns.swarmplot(data=df, x="Day", y="Player Minutes", size=6, color="green")
-	if extraPoints is not False:
-		dfExtra = pd.DataFrame([
-			{"Day": (day - timedelta(hours=12)).strftime('%A'), "Player Minutes": data['playerminutes']}
-			for day, data in extraPoints.items()
-		])
-		sns.swarmplot(data=dfExtra, x="Day", y="Player Minutes", size=8, color="red")
+	sns.swarmplot(data=df, x="Day", y=metricName, size=6, color="green")
+	if dfExtra is not False:
+		sns.swarmplot(data=dfExtra, x="Day", y=metricName, size=8, color="red")
 
 		red_dot = mlines.Line2D(
 			[], [], label='Experiment {} to {}'.format(extraTimes[0], extraTimes[-1]),
 			color='red', marker='o', linestyle='None', markersize=8, )
 		green_dot = mlines.Line2D(
-			[], [], label='Baseline {} to {}'.format(weekTimes[0], weekTimes[-1]),
+			[], [], label='Baseline {} to {}'.format(mainTimes[0], mainTimes[-1]),
 			color='green', marker='o', linestyle='None', markersize=8)
 		ax.legend(handles=[red_dot, green_dot], loc='upper left')
 
 	for i, day in enumerate(dayList):
-		values = df[df['Day'] == day]['Player Minutes'].explode().astype(float)
+		values = df[df['Day'] == day][metricName].explode().astype(float)
 		if not values.empty:
 			median = np.median(values)
-			ax.text(i + 0.2, median, "Median: {:,.0f}".format(median),
+			ax.text(i + 0.2, median, medianStr.format(median),
 				color='black', ha='left', va='center', fontsize=10)
 
-	plt.title("Player Minutes Distribution by Day. Box plots for baseline only.")
-	plt.ylabel("Player Minutes")
+	plt.title("{}. Box plots for baseline only.".format(metricName))
+	plt.ylabel(metricName)
 	plt.xlabel("Day of Week")
 	plt.grid(True)
 	plt.tight_layout()
 	plt.show()
+
+
+def PlotWeekStats(weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
+	metricName = "Player Minutes"
+	df = pd.DataFrame([
+		{"Day": (day - timedelta(hours=12)).strftime('%A'), metricName: pm}
+		for day, data in weekDaily.items()
+		for pm in data["playerminutesList"]
+	])
+	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
+	if extraPoints is not False:
+		dfExtra = pd.DataFrame([
+			{"Day": (day - timedelta(hours=12)).strftime('%A'), metricName: data['playerminutes']}
+			for day, data in extraPoints.items()
+		])
+	else:
+		dfExtra = False
+	MakeBoxplot(metricName, dayList, df, weekTimes, dfExtra, extraTimes)
+
+
+def PlotGameUptime(sizeThreshold, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
+	metricName = "Proportion of day with ≥ {} players in team games".format(sizeThreshold)
+	df = pd.DataFrame([
+		{
+			"Day": (day - timedelta(hours=12)).strftime('%A'), 
+			metricName: CountThresholdProp(dayTimeline, sizeThreshold)
+		}
+		for day, data in weekDaily.items()
+		for dayTimeline in data["dayTimelineList"]
+	])
+	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
+
+	if extraPoints is not False:
+		dfExtra = pd.DataFrame([
+			{
+				"Day": (day - timedelta(hours=12)).strftime('%A'),
+				metricName:  CountThresholdProp(data['dayTimeline'], sizeThreshold)}
+			for day, data in extraPoints.items()
+		])
+	else:
+		dfExtra = False
+	MakeBoxplot(metricName, dayList, df, weekTimes, dfExtra, extraTimes)
+
+
+def PlotGameSizeUptime(sizeThreshold, weekDaily, weekTimes=False, extraPoints=False, extraTimes=False):
+	metricName = "Proportion of day with games of ≥ {} players".format(sizeThreshold)
+	df = pd.DataFrame([
+		{
+			"Day": (day - timedelta(hours=12)).strftime('%A'), 
+			metricName: CountThresholdProp(dayTimeline, sizeThreshold)
+		}
+		for day, data in weekDaily.items()
+		for dayTimeline in data["dayMaxList"]
+	])
+	dayList = [(day - timedelta(hours=12)).strftime('%A') for day in weekDaily.keys()]
+
+	if extraPoints is not False:
+		dfExtra = pd.DataFrame([
+			{
+				"Day": (day - timedelta(hours=12)).strftime('%A'),
+				metricName:  CountThresholdProp(data['dayMax'], sizeThreshold)}
+			for day, data in extraPoints.items()
+		])
+	else:
+		dfExtra = False
+	MakeBoxplot(metricName, dayList, df, weekTimes, dfExtra, extraTimes)
 
 
 def GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage):
@@ -371,9 +464,10 @@ def GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage):
 	maxTime = False
 	battleCount = {k : len(v) for k, v in processed.items()}
 	mostBattles = heapq.nlargest(trackCount, battleCount, key=battleCount.get)
-	#print(processed.keys())
 
+	print("Get timeline")
 	for title in mostBattles:
+		print(title)
 		battles = processed[title]
 		for data in battles:
 			if minTime is False or minTime > data["start"]:
@@ -396,7 +490,7 @@ def GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage):
 
 	averageCounts = MakeAverageCounts(processed, minTime, step, times, mostBattles)
 	maxCounts = MakeMaximumCounts(processed, minTime, step, times, mostBattles)
-	daily = GetDailyValues(times, averageCounts, minuteScale, dayOffset, mostBattles, processed)
+	daily = GetDailyValues(times, maxCounts, averageCounts, minuteScale, dayOffset, mostBattles, processed)
 	rawRange = [times[0], times[-1]]
 	if weekAverage:
 		maxCounts, daily, times = GetWeekAverage(maxCounts, daily, minuteScale, minTime)
@@ -422,16 +516,21 @@ def ProcessReplayFiles(files, filterOut):
 
 filterOut = [
 	"[A] Pro 1v1 Host",
+	"[A] Pro 1v1 Host #2",
 	"[A] COOP vs AI",
 	"[A] Future Wars Coop",
 	"[A] Units Level Up",
 	"[A] Arena Mod",
+	"[A] Free For All",
+	"[A] Future Warz",
+	"[A] Arena All Welcome",
+	"[A] Free For All (No Elo)",
 ]
 minuteScale = 10
 dayOffset = 6
 
 def GetBigData(weekAverage):
-	trackCount = 5
+	trackCount = 10
 	processed = ProcessReplayFiles(["big.txt", "janFeb.txt"], filterOut)
 	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
 	return times, daily, counts, rawRange
@@ -451,18 +550,22 @@ def PlotBigDataEveryWeek():
 
 
 def PlotExperimentData(wantBoxPlot):
-	trackCount = 7
+	trackCount = 10
+	gameUpSizes = [8, 16, 22]
 	weekAverage = False
 	experimentStart = datetime(2025, 7, 11, 6, 0)
-	processed = ProcessReplayFiles(["early2.txt"], filterOut)
+	processed = ProcessReplayFiles(["early2.txt", "customNonsense.txt"], filterOut)
 	#MakeBattleList(processed)
 	times, daily, counts, rawRange = GetTimelineData(processed, trackCount, minuteScale, dayOffset, weekAverage)
 	PlotTimeline(times, daily, counts, minuteScale, weekAverage)
 	
 	if wantBoxPlot:
 		expDaily = {k : v for k, v in daily.items() if k > experimentStart}
-		bigTimes, bigDaily, _, bigRange = GetBigData(True)
+		bigTimes, bigDaily, bigCounts, bigRange = GetBigData(True)
 		PlotWeekStats(bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
+		for size in gameUpSizes:
+			PlotGameUptime(size, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
+			PlotGameSizeUptime(size, bigDaily, bigRange, expDaily, [experimentStart, rawRange[-1]])
 
 #PlotBigDataEveryWeek()
 PlotExperimentData(True)

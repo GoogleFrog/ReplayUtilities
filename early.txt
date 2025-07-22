@@ -1,11 +1,117 @@
 
+[A] Teams All Welcome
+Teams: 2v2
+Crystallized Plains 1.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	5
+Date: 	7/21/2025 3:33:42 AM (26 minutes ago)
+Duration: 	11 minutes
+[A] COOP vs AI
+Teams: 1 + Bots
+Wanderlust 2.1 (Zero-K v1.13.6.4)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 3:27:11 AM (33 minutes ago)
+Duration: 	0 seconds
+[A] COOP vs AI
+Teams: 1 + Bots
+Wanderlust 2.1 (Zero-K v1.13.6.4)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 3:16:48 AM (43 minutes ago)
+Duration: 	0 seconds
+[A] Teams All Welcome
+Teams: 2v2
+Random Plateaus v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	4
+Spectators: 	7
+Date: 	7/21/2025 3:13:37 AM (47 minutes ago)
+Duration: 	17 minutes
+[A] COOP vs AI
+Teams: 1 + Bots
+Wanderlust 2.1 (Zero-K v1.13.6.4)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 3:11:53 AM (48 minutes ago)
+Duration: 	0 seconds
+[A] COOP vs AI
+Teams: 1 + Bots
+Wanderlust 2.1 (Zero-K v1.13.6.4)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 3:07:56 AM (52 minutes ago)
+Duration: 	0 seconds
+[A] Teams All Welcome
+Teams: 7v8
+IncultaV2 (Zero-K v1.13.6.4)
+	
+Players: 	15
+Spectators: 	5
+Date: 	7/21/2025 2:54:22 AM (66 minutes ago)
+Duration: 	13 minutes
+[A] Future Wars Coop
+Teams: 1 + Bots
+Comet Catcher Redux v3.1 (Future Wars v0.42.0 RC-9)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 2:54:07 AM (66 minutes ago)
+Duration: 	25 minutes
+[A] Future Wars Coop
+Teams: 1 + Bots
+Comet Catcher Redux v3.1 (Future Wars v0.42.0 RC-9)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 2:38:04 AM (82 minutes ago)
+Duration: 	15 minutes
+[A] Future Wars Coop
+Teams: 1 + Bots
+Comet Catcher Redux v3.1 (Future Wars v0.42.0 RC-9)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 2:22:33 AM (98 minutes ago)
+Duration: 	14 minutes
+[A] Future Wars Coop
+Teams: 1 + Bots
+Comet Catcher Redux v3.1 (Future Wars v0.42.0 RC-9)
+	
+Players: 	1
+Spectators: 	0
+Date: 	7/21/2025 2:09:35 AM (111 minutes ago)
+Duration: 	11 minutes
+[A] Teams All Welcome
+Teams: 5v6
+TheRockFinal (Zero-K v1.13.6.4)
+	
+Players: 	11
+Spectators: 	11
+Date: 	7/21/2025 2:00:12 AM (2 hours ago)
+Duration: 	51 minutes 
+
+[A] Teams All Welcome
+Teams: 3v3
+Pinch Point 1.03 (Zero-K v1.13.6.4)
+	
+Players: 	6
+Spectators: 	9
+Date: 	7/21/2025 1:16:35 AM (101 minutes ago)
+Duration: 	36 minutes 
+
 [A] Teams All Welcome #2
 Teams: 2v2
 Alphabet Siege Dry v1.20 (Zero-K v1.13.6.4)
 	
 Players: 	4
 Spectators: 	6
-Date: 	7/20/2025 10:44:43 PM (94 minutes ago)
+Date: 	7/20/2025 10:44:43 PM (2 hours ago)
 Duration: 	9 minutes
 [A] Teams All Welcome #2
 Teams: 4v4
@@ -13,7 +119,7 @@ Lonely Oasis v1.1 (Zero-K v1.13.6.4)
 	
 Players: 	8
 Spectators: 	2
-Date: 	7/20/2025 10:38:33 PM (101 minutes ago)
+Date: 	7/20/2025 10:38:33 PM (2 hours ago)
 Duration: 	2 minutes
 [A] Teams All Welcome #2
 Teams: 5v5

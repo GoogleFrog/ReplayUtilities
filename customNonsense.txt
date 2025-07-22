@@ -1,0 +1,90 @@
+
+Custom Teams
+Teams: 6v6
+Mercurial v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	12
+Spectators: 	6
+Date: 	7/21/2025 7:22:57 PM (5 hours ago)
+Duration: 	7 minutes
+Custom Teams
+Teams: 6v5
+Supreme Strait v1.3 (Zero-K v1.13.6.4)
+	
+Players: 	11
+Spectators: 	7
+Date: 	7/21/2025 7:17:23 PM (5 hours ago)
+Duration: 	0 seconds
+Custom Teams
+Teams: 7v7
+LLTAComplexV2 (Zero-K v1.13.6.4)
+	
+Players: 	14
+Spectators: 	12
+Date: 	7/21/2025 6:55:55 PM (5 hours ago)
+Duration: 	16 minutes
+Custom Teams
+Teams: 7v6
+Fifteen Platforms v1 (Zero-K v1.13.6.4)
+	
+Players: 	13
+Spectators: 	10
+Date: 	7/21/2025 6:38:09 PM (6 hours ago)
+Duration: 	14 minutes
+Custom Teams
+Teams: 6v6
+Mountain Pass V4 (Zero-K v1.13.6.4)
+	
+Players: 	12
+Spectators: 	13
+Date: 	7/21/2025 5:47:36 PM (6 hours ago)
+Duration: 	46 minutes 
+
+Custom Teams
+Teams: 5v5
+Mercurial v1.1 (Zero-K v1.13.6.4)
+	
+Players: 	10
+Spectators: 	12
+Date: 	7/15/2025 12:59:47 PM (6 days ago)
+Duration: 	11 minutes
+Custom Teams
+Teams: 7v6
+Akilon Wastelands ZK v1 (Zero-K v1.13.6.4)
+	
+Players: 	13
+Spectators: 	7
+Date: 	7/15/2025 12:41:01 PM (6 days ago)
+Duration: 	14 minutes
+Custom Teams
+Teams: 7v6
+BananaValley (Zero-K v1.13.6.4)
+	
+Players: 	13
+Spectators: 	6
+Date: 	7/15/2025 12:23:46 PM (6 days ago)
+Duration: 	13 minutes
+Custom Teams
+Teams: 7v7
+BananaValley (Zero-K v1.13.6.4)
+	
+Players: 	14
+Spectators: 	3
+Date: 	7/15/2025 12:20:09 PM (6 days ago)
+Duration: 	0 seconds
+Custom Teams
+Teams: 6v6
+LLTAComplexV2 (Zero-K v1.13.6.4)
+	
+Players: 	12
+Spectators: 	6
+Date: 	7/15/2025 12:02:56 PM (6 days ago)
+Duration: 	12 minutes
+Custom Teams
+Teams: 6v5
+Fallendell_V4 (Zero-K v1.13.6.4)
+	
+Players: 	11
+Spectators: 	6
+Date: 	7/15/2025 11:45:09 AM (6 days ago)
+Duration: 	12 minutes 
