@@ -1,5 +1,86 @@
 
 Custom Teams
+Teams: 10v11
+Gecko Isle Remake v1.2 (Arena Mod v1.0.7)
+	
+Players: 	21
+Spectators: 	7
+Date: 	7/22/2025 6:50:46 PM (4 hours ago)
+Duration: 	29 minutes
+Custom Teams
+Teams: 9v9
+Alphabet Siege Dry v1.20 (Arena Mod v1.0.7)
+	
+Players: 	18
+Spectators: 	11
+Date: 	7/22/2025 6:32:55 PM (4 hours ago)
+Duration: 	14 minutes
+Custom Teams
+Teams: 7v7
+Isidis crack 1.1 (Arena Mod v1.0.7)
+	
+Players: 	14
+Spectators: 	9
+Date: 	7/22/2025 6:13:20 PM (4 hours ago)
+Duration: 	16 minutes
+Custom Teams
+Teams: 9v8
+Taldarim_V3 (Arena Mod v1.0.7)
+	
+Players: 	17
+Spectators: 	9
+Date: 	7/22/2025 5:51:12 PM (5 hours ago)
+Duration: 	16 minutes
+Custom Teams
+Teams: 7v7
+Esker Creek 1.3 (Arena Mod v1.0.7)
+	
+Players: 	14
+Spectators: 	10
+Date: 	7/22/2025 5:34:23 PM (5 hours ago)
+Duration: 	10 minutes
+Custom Teams
+Teams: 5v6
+Theta Crystals 1.0 (Arena Mod v1.0.7)
+	
+Players: 	11
+Spectators: 	7
+Date: 	7/22/2025 5:06:45 PM (5 hours ago)
+Duration: 	21 minutes
+Custom Teams
+Teams: 7v6
+Mercurial v1.1 (Arena Mod v1.0.7)
+	
+Players: 	13
+Spectators: 	8
+Date: 	7/22/2025 4:34:00 PM (6 hours ago)
+Duration: 	20 minutes
+Custom Teams
+Teams: 4v4v4v4
+Real Europe V4 (Arena Mod v1.0.7)
+	
+Players: 	16
+Spectators: 	11
+Date: 	7/22/2025 3:34:16 PM (7 hours ago)
+Duration: 	51 minutes
+Custom Teams
+Teams: 3v2v3v2
+SandCastles2 (Arena Mod v1.0.7)
+	
+Players: 	10
+Spectators: 	15
+Date: 	7/22/2025 2:58:19 PM (8 hours ago)
+Duration: 	32 minutes
+Custom Teams
+Teams: 2v3v2v2
+Crescent_Bay_V2 (Arena Mod v1.0.7)
+	
+Players: 	9
+Spectators: 	12
+Date: 	7/22/2025 2:15:14 PM (8 hours ago)
+Duration: 	39 minutes 
+
+Custom Teams
 Teams: 6v6
 Mercurial v1.1 (Zero-K v1.13.6.4)
 	
